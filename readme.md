@@ -100,7 +100,7 @@ The application's security relies on a combination of **asymmetric (RSA)** and *
 │
 ├── backend/
 │   ├── Dockerfile              # Build instructions for the Go backend
-│   ├── main.go                 # Entry point with HTTP router and middleware
+│   ├── server.go                 # Entry point with HTTP router and middleware
 │   ├── go.mod                  # Go module definitions
 │   │
 │   ├── functions/
@@ -108,7 +108,7 @@ The application's security relies on a combination of **asymmetric (RSA)** and *
 │   │
 │   └── database/
 │       ├── database.go         # DB queries (e.g., GetUserData, InsertFile)
-│       └── init.sql            # DB schema for Docker Compose initialization
+│       └── database.sql            # DB schema for Docker Compose initialization
 │
 └── frontend/
     ├── Dockerfile              # Build instructions for the React frontend
