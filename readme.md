@@ -1,104 +1,128 @@
-Of course. Here is a comprehensive README.md file based on the code and structure of the prajjwalsony/file-vault repository, focusing on the requested sections.
+# File Vault: Secure End-to-End Encrypted File Storage
 
-File Vault: Secure End-to-End Encrypted File Storage
+![Go](https://img.shields.io/badge/Go-1.18+-00ADD8?style=for-the-badge&logo=go)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14-336791?style=for-the-badge&logo=postgresql)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker)
 
-![alt text](https://img.shields.io/badge/Go-1.18+-00ADD8?style=for-the-badge&logo=go)
-![alt text](https://img.shields.io/badge/React-18-61DAFB?style=for-the-badge&logo=react)
-![alt text](https://img.shields.io/badge/PostgreSQL-14-336791?style=for-the-badge&logo=postgresql)
-![alt text](https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker)
+**File Vault** is a full-stack web application designed for secure file storage and sharing. It features a robust end-to-end encryption model that ensures user files and passwords are encrypted on the client-side before ever being transmitted to the server.
 
-File Vault is a full-stack web application designed for secure file storage and sharing. It features a robust end-to-end encryption model that ensures user files and passwords are encrypted on the client-side before ever being transmitted to the server.
+---
 
-Project Description
-What It Is
+## 📘 Project Description
 
-File Vault is a personal cloud storage solution where security is the top priority. Users can register, log in, upload files, manage them, and share them via public links. The core principle is that all sensitive data is encrypted and decrypted exclusively on the client's machine, making it a secure vault for files.
+### 🔐 What It Is
 
-How It's Implemented
+**File Vault** is a personal cloud storage solution where **security is the top priority**. Users can register, log in, upload files, manage them, and share them via public links.
 
-The application is built with a modern tech stack and a multi-layered cryptographic model to ensure end-to-end security.
+All sensitive data is **encrypted and decrypted exclusively on the client-side**, making it a secure vault for your files.
 
-Technology Stack:
+### ⚙️ How It's Implemented
 
-Backend: Written in Go, providing a performant and compiled API. It handles user authentication, file metadata management, and serves encrypted file blobs.
+The application uses a modern tech stack and a multi-layered cryptographic model to ensure **end-to-end security**.
 
-Frontend: A responsive single-page application built with React. It manages all client-side logic, including the crucial encryption and decryption processes using crypto-js and node-forge.
+#### 🧰 Technology Stack
 
-Database: PostgreSQL is used to store user metadata, file metadata (like hash and ownership), and access permissions. The actual file content is also stored as encrypted blobs in the database.
+- **Backend**:  
+  Written in **Go**, the API handles user authentication, file metadata management, and encrypted file blob handling.
 
-Deployment: The entire stack is containerized using Docker and orchestrated with Docker Compose, allowing for easy setup and deployment.
+- **Frontend**:  
+  Built with **React**, the SPA handles encryption/decryption and interacts with the backend via API calls.
 
-Security Architecture:
-The application's security relies on a combination of asymmetric (RSA) and symmetric (AES) encryption.
+- **Database**:  
+  **PostgreSQL** is used for metadata and encrypted blob storage.
 
-Password & Credential Encryption: When a user registers or logs in, their password is not sent directly. Instead, the client fetches the server's public RSA key and encrypts the credentials payload with it. The server then decrypts this with its private key. This protects user passwords during the authentication phase.
+- **Deployment**:  
+  Fully containerized using **Docker** and orchestrated with **Docker Compose** for easy deployment.
 
-Session & Payload Encryption: Upon successful login, a unique AES session key is generated. This key is encrypted and sent to the client, which decrypts it using the user's password. For the rest of the session, all communication payloads (like file lists or access change requests) are encrypted and decrypted using this shared session key, ensuring secure communication.
+---
 
-File Encryption: Before uploading, a file is read into the browser's memory and fully encrypted using the session key. The resulting encrypted blob is what gets sent to the server. The server decrypt and stores this blob. When a user requests a file, the server sends back the encrypted blob, and the client decrypts it in the browser.
+## 🔒 Security Architecture
 
-Features
+The application's security relies on a combination of **asymmetric (RSA)** and **symmetric (AES)** encryption.
 
-End-to-End Encryption (E2EE): The most critical feature. Files are encrypted on the client before upload and decrypted on the client after download.
+### 🗝️ Password & Credential Encryption
 
-Zero-Knowledge Architecture: The server has no access to user passwords.
+- On login/registration, the **client fetches the server’s public RSA key**.
+- The credentials are encrypted with this key before being sent.
+- The server decrypts them using its **private RSA key**.
+- This ensures **no plain-text passwords** are transmitted over the network.
 
-Secure User Authentication: JWT (JSON Web Token) based authentication.
+### 🔑 Session & Payload Encryption
 
-Complete File Management:
+- Upon login, an **AES session key** is generated and encrypted using the user’s password.
+- This session key is then used to encrypt/decrypt all further payloads (e.g., file lists, upload/download data).
 
-Upload, download, and view files securely.
+### 📁 File Encryption
 
-Get a list of all your uploaded files.
+- Files are **encrypted in-browser** using the session key before uploading.
+- The encrypted blob is stored on the server.
+- On download, the **encrypted blob is sent back**, and decrypted **client-side** in the browser.
 
-Delete files.
+---
 
-File Access Control: Set files as PRIVATE (only accessible to you) or PUBLIC (accessible to anyone with the unique link).
+## ✨ Features
 
-Storage Optimization: Files with identical content are only stored once in the database (data deduplication) to save storage space.
+- ✅ **End-to-End Encryption (E2EE)**  
+  Files are encrypted before upload and decrypted only after download — fully in the browser.
 
-IP-Based Rate Limiting: The backend includes a middleware to protect against brute-force attacks and prevent abuse.
+- 🔐 **Zero-Knowledge Architecture**  
+  The server **never sees or stores your password** in plaintext.
 
-Easy Deployment: Fully containerized with Docker for a one-command setup.
+- 🛡️ **Secure Authentication**  
+  Uses **JWT-based auth tokens**.
 
-Project File Structure
+- 🗃️ **Complete File Management**
+  - Upload, download, view files securely.
+  - View all uploaded files.
+  - Delete files.
 
-The repository is organized into three main parts: the backend, the frontend, and the deployment configuration.
+- 🔗 **File Access Control**
+  - Set files as `PRIVATE` (only accessible to you) or `PUBLIC` (via shareable link).
 
-code
-Code
-download
-content_copy
-expand_less
+- 📉 **Storage Optimization**
+  - **Data deduplication** — identical files are stored only once.
+
+- 🚫 **IP-Based Rate Limiting**
+  - Backend includes **rate-limiting middleware** to prevent brute-force attacks.
+
+- 📦 **Easy Deployment**
+  - Fully **Dockerized** — run the entire stack with a single command.
+
+---
+
+## 📁 Project File Structure
+
+```plaintext
 .
 ├── .env.example            # Example environment file with required variables
-├── docker-compose.yml      # Docker Compose file to build and run all services (backend, frontend, db)
+├── docker-compose.yml      # Docker Compose file to build and run all services
 │
 ├── backend/
-│   ├── Dockerfile              # Docker instructions to build the Go backend image
-│   ├── main.go                 # Main application entry point, HTTP router, and middleware
+│   ├── Dockerfile              # Build instructions for the Go backend
+│   ├── main.go                 # Entry point with HTTP router and middleware
 │   ├── go.mod                  # Go module definitions
 │   │
 │   ├── functions/
-│   │   └── functions.go        # Handles all API request logic (e.g., Login, UploadFile)
+│   │   └── functions.go        # API logic (Login, UploadFile, etc.)
 │   │
 │   └── database/
-│       ├── database.go         # Functions for database queries (e.g., GetUserData, InsertFile)
-│       └── init.sql            # SQL schema used by Docker Compose to initialize the database
+│       ├── database.go         # DB queries (e.g., GetUserData, InsertFile)
+│       └── init.sql            # DB schema for Docker Compose initialization
 │
 └── frontend/
-    ├── Dockerfile              # Docker instructions to build the React frontend for production
-    ├── package.json            # NPM dependencies and scripts
+    ├── Dockerfile              # Build instructions for the React frontend
+    ├── package.json            # NPM scripts and dependencies
     │
     ├── public/
-    │   └── index.html          # The main HTML template for the React app
+    │   └── index.html          # HTML entry point
     │
     └── src/
-        ├── index.js            # Entry point for the React application
-        ├── App.js              # Main application component with routing
+        ├── index.js            # React app entry point
+        ├── App.js              # Main app component and routing
         │
-        ├── api.js              # CRITICAL: Contains all client-side API calls and crypto logic
+        ├── api.js              # Client-side API calls and crypto logic
         │
-        ├── components/         # Reusable React components (e.g., Login, Dashboard, FileList)
+        ├── components/         # Reusable components (Login, Dashboard, etc.)
         │
-        └── pages/              # Page components that structure the application's UI
+        └── pages/              # Page-level components for UI structure
