@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Test Page</title>
+    <style>
+        body { font-family: sans-serif; background-color: #f4f4f4; padding: 20px; color: #333; }
+        .container { max-width: 600px; margin: 20px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        h2, h3 { text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px;}
+        button { width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; margin-top: 10px; }
+        button:hover { background-color: #0056b3; }
+        pre { background: #e9e9e9; border: 1px solid #ccc; padding: 10px; white-space: pre-wrap; word-wrap: break-word; font-size: 14px; }
+        .status-bar { padding: 10px; border-radius: 4px; margin-bottom: 15px; text-align: center; font-weight: bold; }
+        .status-bar.success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-bar.error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/node-forge@1.0.0/dist/forge.min.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        <h2>1. Register</h2>
+        <div class="form-group">
+            <label for="reg-id">Username:</label>
+            <input type="text" id="reg-id" value="testUser123">
+        </div>
+        <div class="form-group">
+            <label for="reg-pwd">Password:</label>
+            <input type="password" id="reg-pwd" value="password123">
+        </div>
+        <button onclick="doRegister()">Register</button>
+        <h3>Result:</h3>
+        <pre id="register-result">Pending...</pre>
+    </div>
+
+    <div class="container">
+        <h2>2. Login</h2>
+        <div class="form-group">
+            <label for="login-id">Username:</label>
+            <input type="text" id="login-id" value="testUser123">
+        </div>
+        <div class="form-group">
+            <label for="login-pwd">Password:</label>
+            <input type="password" id="login-pwd" value="password123">
+        </div>
+        <button onclick="doLogin()">Login</button>
+        <h3>Result:</h3>
+        <div id="login-status" class="status-bar error">Status: Not Logged In</div>
+        <pre id="login-result">Pending...</pre>
+    </div>
+
+    <div class="container">
+        <h2>3. Change File Access (Login Required)</h2>
+        <div class="form-group">
+            <label for="access-fileId">File ID:</label>
+            <input type="number" id="access-fileId" value="1">
+        </div>
+        <div class="form-group">
+            <label for="access-newAccess">New Access (PUBLIC/PRIVATE):</label>
+            <input type="text" id="access-newAccess" value="PUBLIC">
+        </div>
+        <button onclick="doChangeAccess()">Change Access</button>
+        <h3>Result:</h3>
+        <pre id="change-access-result">Pending...</pre>
+    </div>
+
+    <div class="container">
+    <h2>5. Upload File (Login Required)</h2>
+    <div class="form-group">
+        <label for="upload-file">Choose File:</label>
+        <input type="file" id="upload-file">
+    </div>
+    <button onclick="doUploadFile()">Upload</button>
+    <h3>Result:</h3>
+    <pre id="upload-result">Pending...</pre>
+</div>
+
+<div class="container">
+    <h2>6. Get File (Login Required)</h2>
+    <div class="form-group">
+        <label for="get-fileId">File ID:</label>
+        <input type="number" id="get-fileId" value="1">
+    </div>
+    <div class="form-group">
+        <label for="get-action">Action (view/download):</label>
+        <input type="text" id="get-action" value="view">
+    </div>
+    <button onclick="doGetFile()">Get File</button>
+    <h3>Result:</h3>
+    <pre id="get-file-result">Pending...</pre>
+</div>
+
+
+    <div class="container">
+    <h2>4. Get File List (Login Required)</h2>
+    <button onclick="doGetFiles()">Get Files</button>
+    <h3>Result:</h3>
+    <pre id="file-list-result">Pending...</pre>
+</div>
+</body>
+
+
+
+<!-- #################### UI GLUE CODE SCRIPT #################### -->
+<script>
+    // --- UI Interaction Functions ---
+
+    async function doRegister() {
+        const id = document.getElementById('reg-id').value;
+        const pwd = document.getElementById('reg-pwd').value;
+        const resultEl = document.getElementById('register-result');
+        resultEl.textContent = 'Processing...';
+        try {
+            const [success, error] = await register(id, pwd);
+            if (success) {
+                resultEl.textContent = 'Registration Successful!';
+            } else {
+                resultEl.textContent = `Error: ${error}`;
+            }
+        } catch (e) {
+            resultEl.textContent = `Fatal Error: ${e.message}`;
+        }
+    }
+
+    async function doLogin() {
+        const id = document.getElementById('login-id').value;
+        const pwd = document.getElementById('login-pwd').value;
+        const resultEl = document.getElementById('login-result');
+        const statusEl = document.getElementById('login-status');
+        resultEl.textContent = 'Processing...';
+        try {
+            const [success, error] = await login(id, pwd);
+            if (success) {
+                statusEl.className = "status-bar success";
+                statusEl.textContent = "Status: Logged In";
+                resultEl.textContent = `Login Successful!\nJWT: ${JWT_TOKEN}\nSession Key: ${SESSION_KEY_B64}`;
+            } else {
+                statusEl.className = "status-bar error";
+                statusEl.textContent = "Status: Not Logged In";
+                resultEl.textContent = `Error: ${error}`;
+            }
+        } catch (e) {
+            statusEl.className = "status-bar error";
+            statusEl.textContent = "Status: Not Logged In";
+            resultEl.textContent = `Fatal Error: ${e.message}`;
+        }
+    }
+
+    async function doChangeAccess() {
+        const fileId = parseInt(document.getElementById('access-fileId').value, 10);
+        const newAccess = document.getElementById('access-newAccess').value;
+        const resultEl = document.getElementById('change-access-result');
+        resultEl.textContent = 'Processing...';
+
+        if(isNaN(fileId)) {
+            resultEl.textContent = 'Error: File ID must be a number.';
+            return;
+        }
+
+        try {
+            const [success, error] = await ChangeAccess(fileId, newAccess.toUpperCase());
+            console.log(success, error)
+            if (success) {
+                resultEl.textContent = `Access for File ID ${fileId} successfully changed to ${newAccess.toUpperCase()}.`;
+            } else {
+                resultEl.textContent = `Error: ${error}`;
+            }
+        } catch (e) {
+            resultEl.textContent = `Fatal Error: ${e.message}`;
+        }
+    }
+
+    async function doGetFiles() {
+    const resultEl = document.getElementById('file-list-result');
+    resultEl.textContent = 'Fetching files...';
+
+    try {
+        // Replace this with your actual API call to get files
+        const [success, files] = await getFileList(); // Example: returns array of file objects
+        console.log(success, files)
+        if (success) {
+            // Format nicely as JSON
+            resultEl.textContent = JSON.stringify(files, null, 2);
+        } else {
+            resultEl.textContent = 'No files found.';
+        }
+    } catch (e) {
+        resultEl.textContent = `Error fetching files: ${e.message}`;
+    }
+}
+
+async function doUploadFile() {
+    const fileInput = document.getElementById('upload-file');
+    const resultEl = document.getElementById('upload-result');
+    if (!fileInput.files.length) {
+        resultEl.textContent = "No file selected!";
+        return;
+    }
+
+    resultEl.textContent = "Processing...";
+    try {
+        const [success, error] = await uploadFile(fileInput.files[0]);
+        if (success) {
+            resultEl.textContent = "Upload Successful!";
+        } else {
+            resultEl.textContent = `Error: ${error}`;
+        }
+    } catch (e) {
+        resultEl.textContent = `Fatal Error: ${e.message}`;
+    }
+}
+
+async function doGetFile() {
+    const fileId = document.getElementById('get-fileId').value;
+    const action = document.getElementById('get-action').value;
+    const resultEl = document.getElementById('get-file-result');
+
+    resultEl.textContent = "Processing...";
+    try {
+        const [success, msg] = await getFile(fileId, action);
+        if (success) {
+            resultEl.textContent = "File retrieved successfully!";
+        } else {
+            resultEl.textContent = `Error: ${msg}`;
+        }
+    } catch (e) {
+        resultEl.textContent = `Fatal Error: ${e.message}`;
+    }
+}
+
+</script>
+
+
+
+<script>
+    const BASE_URL = "http://localhost:3000"
+    var RSA_PUBLIC_KEY
+    var JWT_TOKEN
+    var SESSION_KEY_B64
+
+
+   async function register(id, pwd){
+        let response = await fetch(`${BASE_URL}/getPublicKey`)
+        RSA_PUBLIC_KEY = await response.text()
+        let publicKey;
+        try {
+            publicKey = forge.pki.publicKeyFromPem(RSA_PUBLIC_KEY);
+        } catch (e) {
+            console.error("Failed to parse public key PEM:", e);
+            return null;
+        } 
+
+        let message = JSON.stringify({ id, pwd });
+
+        // Encrypt using RSA-OAEP with SHA-256 for both hashes to match the Go reference.
+        let encryptedBytes = publicKey.encrypt(message, 'RSA-OAEP', {
+                md: forge.md.sha256.create(),
+                mgf1: {
+                    md: forge.md.sha256.create()
+                }
+            });
+
+        let encryptedBase64 = forge.util.encode64(encryptedBytes);
+
+        response = await fetch(`${BASE_URL}/createAccount`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+                body: encryptedBase64 
+            });
+
+        if(response.status !== 200) return [false, await response.text()];
+
+        let result = await response.json();
+        if(result.ERROR==="") return [true, ""];
+        return [false, result.ERROR]
+    }
+
+
+async function login(id, pwd){
+    let response = await fetch(`${BASE_URL}/getPublicKey`)
+    let RSA_PUBLIC_KEY = await response.text()
+    const publicKey = forge.pki.publicKeyFromPem(RSA_PUBLIC_KEY);
+
+    let message = JSON.stringify({ id, pwd });
+
+    // Encrypt using RSA-OAEP with SHA-256 for both hashes to match the Go reference.
+    let encryptedBytes = publicKey.encrypt(message, 'RSA-OAEP', {
+            md: forge.md.sha256.create(),
+            mgf1: {
+                md: forge.md.sha256.create()
+            }
+        });
+
+    let encryptedBase64 = forge.util.encode64(encryptedBytes);
+
+    response = await fetch(`${BASE_URL}/login`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+            body: encryptedBase64 
+        });
+    
+
+    if(response.status !== 200) return [false, await response.text()];
+
+    let userToken = await response.text();
+    JWT_TOKEN = response.headers.get('Authorization'); // Get JWT from Authorization header
+
+    SESSION_KEY_B64 = decryptUserToken(userToken, pwd);
+    return [true, ""]
+}
+
+async function ChangeAccess(fileId, newAccess){
+    let message = JSON.stringify({ fileId, newAccess });
+    let encryptedMessage = encryptMessage(message, SESSION_KEY_B64);
+
+    let response = await fetch(`${BASE_URL}/changeAccess`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'text/plain',
+                'Authorization': JWT_TOKEN
+            },
+            body: encryptedMessage 
+        });
+
+    if(response.status !== 200) {
+        const res = await response.json();
+        return [false, res.ERROR];
+    }
+    let result = await response.json()
+    if(result.ERROR==="") return [true, ""];
+    return [false, result.ERROR]
+}
+
+async function getFileList() {
+    let response = await fetch(`${BASE_URL}/getFileList`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'text/plain',
+                'Authorization': JWT_TOKEN
+           }
+        });
+
+    let res = await response.json();
+    if(response.status !== 200) {
+        return [false, res.ERROR];
+    }
+    let result = null
+    if (res.data!="") {
+        result = JSON.parse(res.data)
+        // console.log(res.data)
+        // let decryptedContent = decryptMessage(res.data, SESSION_KEY_B64)
+        // result = JSON.parse(decryptedContent);
+    }
+    if(res.ERROR==="") return [true, result];
+    return [false, res.ERROR]
+}
+
+async function uploadFile(file) {
+    try {
+        // --- 1. Validate MIME type ---
+        const valid = await validateMime(file);
+        if (!valid) {
+            return [false, "File content does not match declared MIME type"];
+        }
+
+        // --- 2. Create FormData and append file directly ---
+        const formData = new FormData();
+        formData.append('file', file, file.name);
+
+        // --- 3. Send request ---
+        const response = await fetch(`${BASE_URL}/uploadFile`, {
+            method: 'POST',
+            headers: { 
+                'Authorization': JWT_TOKEN
+            },
+            body: formData
+        });
+
+        // --- 4. Handle response ---
+        if (response.ok) {
+            return [true, ""];
+        } else {
+            const resultText = await response.text();
+            return [false, resultText];
+        }
+    } catch (err) {
+        return [false, `Client error: ${err.message}`];
+    }
+}
+
+
+
+
+async function getFile(fileId, action = "view") {
+    try {
+        // 1. Prepare payload
+        const payload = JSON.stringify({ fileId: parseInt(fileId), action });
+        const encryptedBase64 = encryptMessage(payload, SESSION_KEY_B64);
+
+        // 2. Send request
+        const response = await fetch(`${BASE_URL}/getFile`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'text/plain; charset=utf-8',
+                'Authorization': JWT_TOKEN
+            },
+            body: encryptedBase64 
+        });
+
+        // 3. Handle errors
+        if (!response.ok) {
+            const errorResult = await response.json().catch(() => ({}));
+            return [false, errorResult.ERROR || `Server error: ${response.statusText}`];
+        }
+
+        // 4. Get file data directly (no longer encrypted)
+        const fileData = await response.arrayBuffer();
+        const bytes = new Uint8Array(fileData);
+
+        // 5. Extract filename from Content-Disposition header
+        const disposition = response.headers.get('content-disposition') || "";
+        let fileName = "download.bin";
+
+        const match = disposition.match(/filename="?([^"]+)"?/i);
+        if (match) fileName = match[1];
+
+        // 6. Determine content type
+        const contentType = response.headers.get('content-type') || 'application/octet-stream';
+
+        // 7. Create Blob
+        const blob = new Blob([bytes], { type: contentType });
+        const blobUrl = URL.createObjectURL(blob);
+
+        // 8. Handle according to action
+        if (action === "view") {
+            window.open(blobUrl, "_blank");
+        } else if (action === "download") {
+            const a = document.createElement("a");
+            a.href = blobUrl;
+            a.download = fileName;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+        }
+
+        return [true, "File processed successfully"];
+    } catch (err) {
+        console.error("getFile error:", err);
+        return [false, `Client error: ${err.message}`];
+    }
+}
+
+/**
+ * Fetches the logged-in user's information from the server using JWT authentication.
+ *
+ * @returns {Promise<[boolean, object | string]>} A promise that resolves to an array
+ *                                                 containing a success boolean and either the
+ *                                                 user info object or an error message string.
+ */
+async function getUserInfo() {
+    // Check if the user is logged in (i.e., has a JWT)
+    if (!JWT_TOKEN) {
+        return [false, "User is not logged in."];
+    }
+
+    try {
+        const response = await fetch(`${BASE_URL}/getUserInfo`, {
+            method: 'POST',
+            headers: {
+                'Authorization': JWT_TOKEN,
+                'Content-Type': 'application/json'
+            }
+            // No body is sent, as authentication is handled by the JWT in the header.
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.ERROR === "") {
+            // On success, return the user data object (excluding the ERROR field)
+            const { ERROR, ...userInfo } = result;
+            return [true, userInfo];
+        } else {
+            // Return the server's error message
+            return [false, result.ERROR || "An unknown server error occurred."];
+        }
+
+    } catch (e) {
+        console.error("Get user info failed:", e);
+        return [false, `A client-side error occurred: ${e.message}`];
+    }
+}
+
+
+
+
+
+</script>
+
+<script>
+
+function encryptMessage(plaintext, base64SessionKey) {
+    // Parse session key (Base64 → WordArray)
+    const sessionKey = CryptoJS.enc.Base64.parse(base64SessionKey);
+    
+    // Generate random 16-byte IV
+    const iv = CryptoJS.lib.WordArray.random(16);
+
+    // Encrypt the plaintext string directly. CryptoJS handles UTF-8 conversion.
+    const encrypted = CryptoJS.AES.encrypt(plaintext, sessionKey, {
+        iv: iv,
+        mode: CryptoJS.mode.CFB,
+        padding: CryptoJS.pad.NoPadding
+    });
+
+    // Prepend IV to ciphertext
+    const ivAndCiphertext = iv.clone().concat(encrypted.ciphertext);
+
+    // Return Base64 string (IV + ciphertext)
+    return ivAndCiphertext.toString(CryptoJS.enc.Base64);
+}
+
+function decryptMessage(base64MessageEncrypted, base64SessionKey){
+    const decodedToken = CryptoJS.enc.Base64.parse(base64MessageEncrypted);
+    const sessionKey = CryptoJS.enc.Base64.parse(base64SessionKey);
+
+    // Split IV and ciphertext
+    const iv = CryptoJS.lib.WordArray.create(decodedToken.words.slice(0, 4));
+    const ciphertext = CryptoJS.lib.WordArray.create(decodedToken.words.slice(4));
+
+    // AES-CFB decryption
+    const decrypted = CryptoJS.AES.decrypt({ ciphertext: ciphertext }, sessionKey, {
+        iv: iv,
+        mode: CryptoJS.mode.CFB,
+        padding: CryptoJS.pad.NoPadding
+    });
+
+    // Return the decrypted plaintext as a UTF-8 string.
+    return decrypted.toString(CryptoJS.enc.Utf8);
+}
+
+function decryptUserToken(base64MessageEncrypted, pwd){
+    const decodedToken = CryptoJS.enc.Base64.parse(base64MessageEncrypted);
+    const decryptionKey = CryptoJS.SHA256(pwd);
+
+    // Split IV and ciphertext
+    const iv = CryptoJS.lib.WordArray.create(decodedToken.words.slice(0, 4));
+    const ciphertext = CryptoJS.lib.WordArray.create(decodedToken.words.slice(4));
+
+    // AES-CFB decryption
+    const decrypted = CryptoJS.AES.decrypt({ ciphertext: ciphertext }, decryptionKey, {
+        iv: iv,
+        mode: CryptoJS.mode.CFB,
+        padding: CryptoJS.pad.NoPadding
+    });
+
+    // Return the decrypted plaintext as a UTF-8 string.
+    return decrypted.toString(CryptoJS.enc.Base64);
+}
+
+function decodeJWT(token) {
+    const [headerB64, payloadB64, signature] = token.split(".");
+
+    // Base64 decoding (URL-safe)
+    const header = JSON.parse(atob(headerB64.replace(/-/g, "+").replace(/_/g, "/")));
+    const payload = JSON.parse(atob(payloadB64.replace(/-/g, "+").replace(/_/g, "/")));
+    // return [header, payload, signature]
+    console.log("Header:", header);
+    console.log("Payload:", payload);
+    console.log("Signature:", signature); // optional
+}
+
+async function validateMime(file) {
+    const signatures = {
+        "image/png": [[0x89, 0x50, 0x4E, 0x47]],
+        "image/jpeg": [[0xFF, 0xD8, 0xFF]],
+        "application/pdf": [[0x25, 0x50, 0x44, 0x46]],
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": [[0x50, 0x4B, 0x03, 0x04]],
+        // add more as needed
+    };
+
+    let buffer = new Uint8Array(await file.slice(0, 8).arrayBuffer()); // first 8 bytes
+    let expectedSigs = signatures[file.type];
+
+    if (!expectedSigs) {
+        console.warn("Unknown file type:", file.type, "skipping validation");
+        return true; // skip unknown types
+    }
+
+    return expectedSigs.some(sig =>
+        sig.every((b, i) => buffer[i] === b)
+    );
+}
+
+// Helper function to get MIME type from filename
+function getMimeTypeFromFilename(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    const mimeTypes = {
+        'pdf': 'application/pdf',
+        'txt': 'text/plain',
+        'html': 'text/html',
+        'css': 'text/css',
+        'js': 'application/javascript',
+        'json': 'application/json',
+        'png': 'image/png',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'gif': 'image/gif',
+        'svg': 'image/svg+xml',
+        'mp4': 'video/mp4',
+        'mp3': 'audio/mpeg',
+        'zip': 'application/zip',
+        'doc': 'application/msword',
+        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'xls': 'application/vnd.ms-excel',
+        'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    };
+    return mimeTypes[ext] || 'application/octet-stream';
+}
+
+</script>
+
+</html>

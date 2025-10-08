@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: securevault-backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - GO_ENV=production
+    networks:
+      - app-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: securevault-frontend
+    ports:
+      - "80:80"
+    environment:
+      - REACT_APP_BACKEND_URL=https://prajjwal-backend.norsulabs.com
+    depends_on:
+      - backend
+    networks:
+      - app-network
+    restart: unless-stopped
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  # Add any volumes here if needed for data persistence
+  app-data:

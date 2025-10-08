@@ -1,0 +1,12 @@
+# Go backend .dockerignore
+*.exe
+*.exe~
+.git
+.gitignore
+README.md
+.env
+.DS_Store
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

@@ -1,0 +1,350 @@
+/* --- Global & Fonts --- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #007bff;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --light-gray: #f8f9fa;
+  --medium-gray: #e9ecef;
+  --dark-gray: #6c757d;
+  --text-color: #212529;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--light-gray);
+  margin: 0;
+  color: var(--text-color);
+}
+
+/* --- Spinner --- */
+.spinner {
+  border: 2px solid rgba(255, 255, 255, 0.3); /* Light border for solid buttons */
+  border-top-color: #fff; /* White for solid buttons */
+  border-radius: 50%;
+  animation: spin 0.8s ease-in-out infinite;
+}
+.file-actions .spinner {
+  border-color: rgba(0, 0, 0, 0.2); /* Darker for transparent buttons */
+  border-top-color: var(--primary-color);
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* --- Auth Page (Redesigned) --- */
+.auth-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: var(--light-gray);
+}
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  background: white;
+  padding: 40px 30px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+.auth-header h2 {
+  margin: 0 0 10px;
+  font-size: 2rem;
+  color: var(--primary-color);
+}
+.auth-header p {
+  margin: 0 0 30px;
+  color: var(--dark-gray);
+}
+.auth-form .input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+.auth-form .input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #adb5bd;
+}
+.auth-form input {
+  width: 100%;
+  padding: 12px 15px 12px 50px; /* Add padding for icon */
+  border: 1px solid var(--medium-gray);
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.auth-form input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.2);
+}
+.auth-button {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+.auth-button:hover {
+  background-color: #0069d9;
+}
+.auth-button:disabled {
+  background-color: #0056b3;
+  cursor: not-allowed;
+}
+.auth-message {
+  color: var(--danger-color);
+  font-size: 14px;
+  margin-bottom: 15px;
+  text-align: left;
+}
+.auth-message.success {
+  color: var(--success-color);
+}
+.auth-footer {
+  margin-top: 20px;
+  font-size: 14px;
+  color: var(--dark-gray);
+}
+.auth-footer button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0 5px;
+  font-size: 14px;
+}
+
+/* --- File Card Button States --- */
+.file-actions button:disabled {
+  cursor: not-allowed;
+  background-color: var(--light-gray) !important;
+  color: var(--dark-gray) !important;
+}
+
+/* --- Error Modal --- */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: var(--border-radius);
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  animation: slideIn 0.3s ease;
+}
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--dark-gray);
+}
+.modal-icon {
+  margin-bottom: 15px;
+}
+.modal-content h4 {
+  margin: 0 0 10px;
+  font-size: 1.25rem;
+}
+.modal-content p {
+  margin: 0 0 20px;
+  color: var(--dark-gray);
+}
+.modal-ok-button {
+  width: 100px;
+  padding: 10px;
+  background-color: var(--danger-color);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+.modal-ok-button:hover {
+  background-color: #c82333;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideIn {
+  from { transform: translateY(-30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* --- Existing Dashboard & Header Styles --- */
+/* (Keep all the other beautiful dashboard styles from the previous step) */
+
+.loading-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.2rem;
+  color: var(--dark-gray);
+}
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 30px;
+  height: 70px;
+  background-color: white;
+  border-bottom: 1px solid var(--medium-gray);
+}
+.logo h3 { margin: 0; color: var(--primary-color); }
+.user-menu { display: flex; align-items: center; gap: 15px; }
+.admin-badge { background-color: #ffc107; color: #333; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+.logout-button { display: flex; align-items: center; gap: 8px; padding: 8px 15px; background: var(--light-gray); border: 1px solid var(--medium-gray); border-radius: var(--border-radius); cursor: pointer; font-weight: 500; transition: background-color 0.2s; }
+.logout-button:hover { background-color: #dee2e6; }
+.dashboard-main { padding: 30px; max-width: 1400px; margin: 0 auto; }
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }
+.content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; align-items: start; }
+.stat-card { display: flex; align-items: center; gap: 20px; background: white; padding: 25px; border-radius: var(--border-radius); box-shadow: var(--box-shadow); }
+.stat-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; justify-content: center; align-items: center; }
+.stat-info { display: flex; flex-direction: column; }
+.stat-label { color: var(--dark-gray); font-size: 14px; }
+.stat-value { font-size: 1.5rem; font-weight: 600; }
+.file-list-container { background: white; padding: 25px; border-radius: var(--border-radius); box-shadow: var(--box-shadow); }
+.file-list-container h3 { margin-top: 0; }
+.empty-state { text-align: center; padding: 40px; color: var(--dark-gray); }
+.file-card { display: flex; align-items: center; gap: 15px; padding: 15px; border-radius: var(--border-radius); border: 1px solid var(--medium-gray); margin-bottom: 15px; transition: box-shadow 0.2s, border-color 0.2s; }
+.file-card:hover { border-color: var(--primary-color); box-shadow: 0 4px 10px rgba(0, 123, 255, 0.1); }
+.file-details { flex-grow: 1; }
+.file-name { margin: 0 0 5px 0; font-weight: 600; }
+.file-meta { display: flex; gap: 15px; font-size: 12px; color: var(--dark-gray); }
+.file-access { font-weight: bold; text-transform: uppercase; }
+.file-access.public { color: var(--success-color); }
+.file-access.private { color: var(--danger-color); }
+.file-actions { display: flex; gap: 5px; }
+.file-actions button { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: none; border: 1px solid transparent; border-radius: 50%; cursor: pointer; color: var(--dark-gray); transition: background-color 0.2s, color 0.2s; }
+.file-actions button:hover { background-color: var(--light-gray); color: var(--primary-color); }
+.file-actions button.delete:hover { color: var(--danger-color); }
+.upload-container { background: white; padding: 25px; border-radius: var(--border-radius); box-shadow: var(--box-shadow); position: sticky; top: 30px; }
+.upload-container h3 { margin-top: 0; }
+.upload-box { border: 2px dashed var(--medium-gray); border-radius: var(--border-radius); padding: 30px; text-align: center; position: relative; transition: border-color 0.2s; }
+.upload-box:hover { border-color: var(--primary-color); }
+.upload-box p { margin: 10px 0 0 0; color: var(--dark-gray); font-weight: 500; }
+.upload-box input[type="file"] { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.upload-button { width: 100%; padding: 12px; margin-top: 20px; background-color: var(--primary-color); color: white; border: none; border-radius: var(--border-radius); font-size: 16px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
+.upload-button:hover { background-color: #0069d9; }
+.upload-button:disabled { background-color: var(--medium-gray); cursor: not-allowed; }
+@media (max-width: 992px) { .content-grid { grid-template-columns: 1fr; } }
+@media (max-width: 768px) { .dashboard-header { flex-direction: column; height: auto; padding: 15px; gap: 10px; } .dashboard-main { padding: 15px; } }
+
+/* --- New Styles for Admin/Search Features --- */
+
+/* Header for the File List section */
+.file-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap; /* Allows search to wrap on small screens */
+  gap: 15px;
+}
+
+.file-list-header h3 {
+  margin: 0;
+}
+
+/* Search Bar */
+.search-bar {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--dark-gray);
+  pointer-events: none; /* Make icon unclickable */
+}
+
+.search-bar input {
+  padding: 8px 12px 8px 38px; /* Left padding for icon */
+  border: 1px solid var(--medium-gray);
+  border-radius: var(--border-radius);
+  min-width: 250px;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.search-bar input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+/* File Owner Tag in FileCard */
+.file-owner {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--light-gray);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+}
+
+/* Copy Link Button */
+.file-actions .copy-link-button {
+  color: var(--success-color);
+  font-weight: 600;
+  width: auto; /* Allow text to fit */
+  min-width: 32px;
+  padding: 0 8px;
+}
+.file-actions .copy-link-button:hover {
+  background-color: #eaf6ec;
+  color: #1c7430;
+}
+
+.file-download-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background-color: var(--medium-gray);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 500;
+  color: var(--text-color);
+}
